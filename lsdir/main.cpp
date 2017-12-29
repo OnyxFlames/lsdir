@@ -4,17 +4,39 @@
 
 namespace fs = std::experimental::filesystem;
 
-void list_dir_r(const std::string dir, size_t recur_depth = 0)
+void list_dir_new(const std::string dir,
+	size_t recur_depth = 0,
+	bool recursive = false,
+	bool show_size = false)
 {
 	for (auto &d : fs::directory_iterator(dir))
 	{
-		std::cout << std::string(recur_depth, '-');
-		if (recur_depth > 0)
-			std::cout << '|';
+		if (recursive)
+		{
+			std::cout << std::string(recur_depth, '-');
+			if (recur_depth > 0)
+				std::cout << '|';
+		}
 		std::cout << d.path().filename() << '\n';
 		if (fs::is_directory(d.path()))
 		{
-			list_dir_r(d.path().string(), recur_depth + 1);
+			if(recursive)
+				list_dir_new(d.path().string(), recur_depth + 1, recursive, show_size);
+		}
+	}
+}
+
+void list_dir_r(const std::string dir, size_t depth = 0)
+{
+	for (auto& d : fs::directory_iterator(dir))
+	{
+		std::cout << std::string(depth, '-');
+		if (depth > 0)
+			std::cout << '|';
+		std::cout << d.path().filename() << '\n';
+		if (fs::is_directory(dir))
+		{
+			list_dir_r(d.path().string(), depth + 1);
 		}
 	}
 }
@@ -27,7 +49,7 @@ void list_dir(const std::string dir)
 
 int main()
 {
-	list_dir("../");
+	list_dir_r("../");
 	getchar();
 	return 0;
 }
