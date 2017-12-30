@@ -51,7 +51,7 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 			std::cout << fg_brightblue << std::string(depth, '-') << reset;
 			if (depth > 0)
 				std::cout << fg_white << '|';
-			if (d.path().filename().string()[0] == '.')
+			if (d.path().string()[0] == '.')
 				std::cout << fg_cyan << d.path().filename() << '\n';
 			else
 				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
@@ -166,7 +166,9 @@ int main(int argc, char* argv[])
 		{
 			std::cout << "Not a drive.";
 			if (list_drives().size() > 0)
-				std::cout << "Found drives: \n\t";
+				std::cout << " Found drives: \n\t";
+			else
+				std::cout << "\n";
 			for (const auto d : list_drives())
 				std::cout << d << "\t";
 		}
@@ -188,52 +190,9 @@ int main(int argc, char* argv[])
 			|| std::string(argv[3]) == "--verbose"))
 			verbose = true;
 
-		uint16_t magnitude = 0;
-		uintmax_t size = fs::file_size(fs::path(argv[2]));
-		uintmax_t counter = size;
-
-		//TODO: figure out if files are 1000's or 1024's
-		const unsigned short divisor = 1024;
-
-		if (size > divisor)
-		{
-			magnitude++;
-			while ((size /= divisor) >= divisor)
-			{
-				magnitude++;
-			}
-		}
+		std::cout << to_smallestmagnitude(fs::file_size(argv[2])) << ' ' << to_longsuffix(fs::file_size(argv[2])) << '\n';
 		if (verbose)
-		{
-			switch (magnitude)
-			{
-				case 0: std::cout << size << " bytes\t"; break;
-				case 1: std::cout << size << " kilobytes\t"; break;
-				case 2: std::cout << size << " megabytes\t"; break;
-				case 3: std::cout << size << " gigabytes\t"; break;
-				case 4: std::cout << size << " terabytes\t"; break;
-				case 5: std::cout << size << " petabytes\t"; break;
-				default: std::cout << "Unknown\n"; break;
-			}
-			if (magnitude > 0)
-				std::cout << "(" << counter << " bytes)\n";
-			else
-				std::cout << '\n';
-
-		}
-		else
-		{
-			switch (magnitude)
-			{
-			case 0: std::cout << size << " bytes\n"; break;
-			case 1: std::cout << size << " kilobytes\n"; break;
-			case 2: std::cout << size << " megabytes\n"; break;
-			case 3: std::cout << size << " gigabytes\n"; break;
-			case 4: std::cout << size << " terabytes\n"; break;
-			case 5: std::cout << size << " petabytes\n"; break;
-			default: std::cout << "Unknown\n"; break;
-			}
-		}
+			std::cout << "("<< fs::file_size(argv[2]) << " bytes)\n";
 	}
 	else
 	{
