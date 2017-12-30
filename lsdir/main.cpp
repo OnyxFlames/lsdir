@@ -164,7 +164,9 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			std::cout << "Not a drive. Found drives:\n\t";
+			std::cout << "Not a drive.";
+			if (list_drives().size() > 0)
+				std::cout << "Found drives: \n\t";
 			for (const auto d : list_drives())
 				std::cout << d << "\t";
 		}

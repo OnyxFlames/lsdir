@@ -23,7 +23,7 @@ const std::vector<std::string> list_drives()
 	{
 		std::string str = "sd";
 		str += d;
-		//str += ":";
+		str += "1";
 		if (fs::exists(str))
 		{
 			drives.push_back(str);
@@ -33,7 +33,7 @@ const std::vector<std::string> list_drives()
 	{
 		std::string str = "hd";
 		str += d;
-		//str += ":";
+		str += "1";
 		if (fs::exists(str))
 		{
 			drives.push_back(str);
