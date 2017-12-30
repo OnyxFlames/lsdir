@@ -1,6 +1,8 @@
 #include <iostream>
 #include <experimental/filesystem>
 
+#include "Utils.hpp"
+
 #define LSDIR_COLOR
 
 #ifdef LSDIR_COLOR
@@ -66,15 +68,23 @@ void list_dir(const std::string dir)
 	if (verbose)
 		for (auto &d : fs::directory_iterator(dir))
 		{
-			std::cout << fg_brightcyan << d.path().filename() << reset << '\t';
-			if (fs::is_directory(d))
-				std::cout << "/\n";
-			else
-				std::cout << "*\n";
+			if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
+			{
+				std::cout << fg_brightcyan << d.path().filename() << reset << '\t';
+				if (fs::is_directory(d))
+					std::cout << "/\n";
+				else
+					std::cout << "*\n";
+			}
 		}
 	else
 		for (auto &d : fs::directory_iterator(dir))
-			std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
+		{
+			if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
+			{
+				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
+			}
+		}
 }
 
 int main(int argc, char* argv[])
@@ -90,18 +100,21 @@ int main(int argc, char* argv[])
 		std::cout << "Usage: " << argv[0] << " <directory> or\n\t" <<
 			argv[0] << " <flag> <file/directory> [extra-flag]\n"
 			"Available flags: \n"
-			" -l - lists files in directory\n"
-			" -r - lists files in directory as well as their children directories\n"
-			" -d - lists drive info\n"
+			" -l/--list - lists files in directory\n"
+			" -r/--recursive - lists files in directory as well as their children directories\n"
+			" -d/--drive - lists drive info\n"
 			" -s/--sizeof - returns size of given file";
 	}
 	// list
-	else if (std::string(argv[1]) == "-l")
+	else if (std::string(argv[1]) == "-l"
+		|| std::string(argv[1]) == "--list")
 	{
 		if (argc > 3 
 			&& (std::string(argv[3]) == "-v"
 			|| std::string(argv[3]) == "--verbose"))
 			verbose = true;
+		if (argc > 3 && std::string(argv[3]) == "-a")
+			show_hidden = true;
 
 		if (argc < 3)
 			list_dir(".");
@@ -122,7 +135,8 @@ int main(int argc, char* argv[])
 		}
 	}
 	// recursive list
-	else if (std::string(argv[1]) == "-r")
+	else if (std::string(argv[1]) == "-r"
+		|| std::string(argv[1]) == "--recursive")
 	{
 		if (argc > 3 && std::string(argv[3]) == "-a")
 			show_hidden = true;
@@ -133,7 +147,8 @@ int main(int argc, char* argv[])
 			list_dir_r(argv[2]);
 	}
 	// list drives and usage
-	else if (std::string(argv[1]) == "-d")
+	else if (std::string(argv[1]) == "-d"
+		|| std::string(argv[1]) == "--drive")
 	{
 		// todo: add util that converts to largest magnitude
 		if (argc > 2 && fs::exists(argv[2]))
@@ -148,7 +163,11 @@ int main(int argc, char* argv[])
 				std::cout << fg_brightred << "\tUnavailable:\t" << (si.free - si.available) << "\n";
 		}
 		else
-			std::cout << "Not a drive.\n";
+		{
+			std::cout << "Not a drive. Found drives:\n\t";
+			for (const auto d : list_drives())
+				std::cout << d << "\t";
+		}
 	}
 	// show size of given file
 	else if (std::string(argv[1]) == "-s"
