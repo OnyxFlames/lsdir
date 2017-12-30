@@ -156,9 +156,9 @@ int main(int argc, char* argv[])
 			fs::space_info si;
 			si = fs::space(argv[2]);
 			std::cout << "Drive '" << fs::path(argv[2]) << "'\t\n"
-				<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << si.available << reset << "\n"
-				<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << si.capacity << reset << "\n"
-				<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << si.free << reset << "\n";
+				<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << reset << "\n"
+				<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << reset << "\n"
+				<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << reset << "\n";
 			if (si.free != si.available)
 				std::cout << fg_brightred << "\tUnavailable:\t" << (si.free - si.available) << "\n";
 		}

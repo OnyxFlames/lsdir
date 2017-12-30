@@ -100,10 +100,10 @@ const std::string to_longsuffix(uintmax_t num)
 		}
 }
 
-const uintmax_t to_smallestmagnitude(uintmax_t num)
+const double to_smallestmagnitude(uintmax_t num)
 {
 	uint16_t magnitude = 0;
-	uintmax_t size = num;
+	double size = num;
 	uintmax_t counter = size;
 
 	//TODO: figure out if files are 1000's or 1024's
