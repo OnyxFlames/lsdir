@@ -4,6 +4,8 @@
 
 namespace fs = std::experimental::filesystem;
 
+bool show_hidden = true;
+
 void list_dir_new(const std::string dir,
 	size_t recur_depth = 0,
 	bool recursive = false,
@@ -30,13 +32,16 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 {
 	for (auto& d : fs::directory_iterator(dir))
 	{
-		std::cout << std::string(depth, '-');
-		if (depth > 0)
-			std::cout << '|';
-		std::cout << d.path().filename() << '\n';
-		if (fs::is_directory(dir))
+		if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
 		{
-			list_dir_r(d.path().string(), depth + 1);
+			std::cout << "\033[91m" << std::string(depth, '-') << "\033[0m";
+			if (depth > 0)
+				std::cout << '|';
+			std::cout << "\033[36m" << d.path().filename() << "\033[0m" << '\n';
+			if (fs::is_directory(dir))
+			{
+				list_dir_r(d.path().string(), depth + 1);
+			}
 		}
 	}
 }
@@ -50,6 +55,6 @@ void list_dir(const std::string dir)
 int main()
 {
 	list_dir_r("../");
-	getchar();
+	//getchar();
 	return 0;
 }
