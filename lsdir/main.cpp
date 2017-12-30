@@ -121,7 +121,20 @@ int main(int argc, char* argv[])
 	// list drives and usage
 	else if (std::string(argv[1]) == "-d")
 	{
-		std::cout << "Drive listing unavailable.\n";
+		// todo: add util that converts to largest magnitude
+		if (argc > 2 && fs::exists(argv[2]))
+		{
+			fs::space_info si;
+			si = fs::space(argv[2]);
+			std::cout << "Drive '" << fs::path(argv[2]) << "'\t\n"
+				<< "\tAvailable:\t" << si.available << "\n"
+				<< "\tCapacity:\t" << si.capacity << "\n"
+				<< "\tFree:\t\t" << si.free << "\n";
+			if (si.free != si.available)
+				std::cout << "\tUnavailable:\t" << (si.free - si.available) << "\n";
+		}
+		else
+			std::cout << "Not a drive.\n";
 	}
 	// show size of given file
 	else if (std::string(argv[1]) == "--sizeof")
