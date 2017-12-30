@@ -52,7 +52,7 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 			if (depth > 0)
 				std::cout << fg_white << '|';
 			if (d.path().string()[0] == '.')
-				std::cout << fg_cyan << d.path().filename() << '\n';
+				std::cout << fg_brightcyan << d.path().filename() << '\n';
 			else
 				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
 			if (fs::is_directory(dir))
