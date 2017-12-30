@@ -1,6 +1,38 @@
 #include <iostream>
-
 #include <experimental/filesystem>
+
+#define LSDIR_COLOR
+
+#ifdef LSDIR_COLOR
+	const char* reset = "\033[0m";
+	const char* fg_red = "\033[31m";
+	const char* fg_green = "\033[32m";
+	const char* fg_yellow = "\033[33m";
+	const char* fg_blue = "\033[34m";
+	const char* fg_magenta = "\033[35m";
+	const char* fg_cyan = "\033[36m";
+	const char* fg_white = "\033[37m";
+	const char* fg_brightred = "\033[91m";
+	const char* fg_brightgreen = "\033[92m";
+	const char* fg_brightyellow = "\033[93m";
+	const char* fg_brightblue = "\033[94m";
+	const char* fg_brightmagenta = "\033[95m";
+	const char* fg_brightcyan = "\033[96m";
+#elif
+	const char* fg_red = "";
+	const char* fg_green = "";
+	const char* fg_yellow = "";
+	const char* fg_blue = "";
+	const char* fg_magenta = "";
+	const char* fg_cyan = "";
+	const char* fg_white = "";
+	const char* fg_brightred = "";
+	const char* fg_brightgreen = "";
+	const char* fg_brightyellow = "";
+	const char* fg_brightblue = "";
+	const char* fg_brightmagenta = "";
+	const char* fg_brightcyan = "";
+#endif
 
 namespace fs = std::experimental::filesystem;
 
@@ -13,10 +45,10 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 	{
 		if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
 		{
-			std::cout << "\033[91m" << std::string(depth, '-') << "\033[0m";
+			std::cout << fg_cyan << std::string(depth, '-') << reset;
 			if (depth > 0)
-				std::cout << '|';
-			std::cout << "\033[36m" << d.path().filename() << "\033[0m" << '\n';
+				std::cout << fg_cyan << '|';
+			std::cout << fg_cyan << d.path().filename() << reset << '\n';
 			if (fs::is_directory(dir))
 			{
 				list_dir_r(d.path().string(), depth + 1);
@@ -49,9 +81,9 @@ int main(int argc, char* argv[])
 	// default to list and assume the next arg is a directory
 	else if (argc < 3)
 	{
-		if (fs::exists(argv[2]) && fs::is_directory(argv[2]))
+		if (fs::exists(argv[1]) && fs::is_directory(argv[1]))
 		{
-			list_dir(argv[2]);
+			list_dir(argv[1]);
 		}
 		else
 		{
@@ -86,7 +118,7 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 		// verbose
-		if (argc > 3 && std::string(argv[2]) == "-v")
+		if (argc > 3 && std::string(argv[3]) == "-v")
 			verbose = true;
 
 		uint16_t magnitude = 0;
