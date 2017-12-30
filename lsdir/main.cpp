@@ -1,7 +1,7 @@
 #include <iostream>
 #include <experimental/filesystem>
 
-//#define LSDIR_COLOR
+#define LSDIR_COLOR
 
 #ifdef LSDIR_COLOR
 	const char* reset = "\033[0m";
@@ -19,7 +19,7 @@
 	const char* fg_brightmagenta = "\033[95m";
 	const char* fg_brightcyan = "\033[96m";
 #else
-	const char* reset = "\033[0m";
+	const char* reset = "";
 	const char* fg_red = "";
 	const char* fg_green = "";
 	const char* fg_yellow = "";
@@ -46,10 +46,13 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 	{
 		if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
 		{
-			std::cout << fg_cyan << std::string(depth, '-') << reset;
+			std::cout << fg_brightblue << std::string(depth, '-') << reset;
 			if (depth > 0)
-				std::cout << fg_cyan << '|';
-			std::cout << fg_cyan << d.path().filename() << reset << '\n';
+				std::cout << fg_white << '|';
+			if (d.path().filename().string()[0] == '.')
+				std::cout << fg_cyan << d.path().filename() << '\n';
+			else
+				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
 			if (fs::is_directory(dir))
 			{
 				list_dir_r(d.path().string(), depth + 1);
@@ -63,7 +66,7 @@ void list_dir(const std::string dir)
 	if (verbose)
 		for (auto &d : fs::directory_iterator(dir))
 		{
-			std::cout << d.path().filename() << '\t';
+			std::cout << fg_brightcyan << d.path().filename() << reset << '\t';
 			if (fs::is_directory(d))
 				std::cout << "/\n";
 			else
@@ -71,7 +74,7 @@ void list_dir(const std::string dir)
 		}
 	else
 		for (auto &d : fs::directory_iterator(dir))
-			std::cout << d.path().filename() << '\n';
+			std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
 }
 
 int main(int argc, char* argv[])
@@ -79,7 +82,18 @@ int main(int argc, char* argv[])
 	// default to list
 	if (argc < 2)
 	{
-		list_dir("");
+		list_dir(".");
+	}
+	else if(std::string(argv[1]) == "-h"
+		|| std::string(argv[1]) == "--help")
+	{
+		std::cout << "Usage: " << argv[0] << " <directory> or\n\t" <<
+			argv[0] << " <flag> <file/directory> [extra-flag]\n"
+			"Available flags: \n"
+			" -l - lists files in directory\n"
+			" -r - lists files in directory as well as their children directories\n"
+			" -d - lists drive info\n"
+			" -s/--sizeof - returns size of given file";
 	}
 	// list
 	else if (std::string(argv[1]) == "-l")
@@ -90,7 +104,7 @@ int main(int argc, char* argv[])
 			verbose = true;
 
 		if (argc < 3)
-			list_dir("");
+			list_dir(".");
 		else
 			list_dir(argv[2]);
 	}
@@ -114,7 +128,7 @@ int main(int argc, char* argv[])
 			show_hidden = true;
 
 		if (argc < 3)
-			list_dir_r("");
+			list_dir_r(".");
 		else
 			list_dir_r(argv[2]);
 	}
@@ -127,17 +141,18 @@ int main(int argc, char* argv[])
 			fs::space_info si;
 			si = fs::space(argv[2]);
 			std::cout << "Drive '" << fs::path(argv[2]) << "'\t\n"
-				<< "\tAvailable:\t" << si.available << "\n"
-				<< "\tCapacity:\t" << si.capacity << "\n"
-				<< "\tFree:\t\t" << si.free << "\n";
+				<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << si.available << reset << "\n"
+				<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << si.capacity << reset << "\n"
+				<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << si.free << reset << "\n";
 			if (si.free != si.available)
-				std::cout << "\tUnavailable:\t" << (si.free - si.available) << "\n";
+				std::cout << fg_brightred << "\tUnavailable:\t" << (si.free - si.available) << "\n";
 		}
 		else
 			std::cout << "Not a drive.\n";
 	}
 	// show size of given file
-	else if (std::string(argv[1]) == "--sizeof")
+	else if (std::string(argv[1]) == "-s"
+		|| std::string(argv[1]) == "--sizeof")
 	{
 		if (argc < 3 
 			|| !fs::exists(argv[2]) 
