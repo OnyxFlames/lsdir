@@ -1,7 +1,7 @@
 #include <iostream>
 #include <experimental/filesystem>
 
-#define LSDIR_COLOR
+//#define LSDIR_COLOR
 
 #ifdef LSDIR_COLOR
 	const char* reset = "\033[0m";
@@ -18,7 +18,8 @@
 	const char* fg_brightblue = "\033[94m";
 	const char* fg_brightmagenta = "\033[95m";
 	const char* fg_brightcyan = "\033[96m";
-#elif
+#else
+	const char* reset = "\033[0m";
 	const char* fg_red = "";
 	const char* fg_green = "";
 	const char* fg_yellow = "";
@@ -59,8 +60,18 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 
 void list_dir(const std::string dir)
 {
-	for (auto &d : fs::directory_iterator(dir))
-		std::cout << d.path().filename() << '\n';
+	if (verbose)
+		for (auto &d : fs::directory_iterator(dir))
+		{
+			std::cout << d.path().filename() << '\t';
+			if (fs::is_directory(d))
+				std::cout << "/\n";
+			else
+				std::cout << "*\n";
+		}
+	else
+		for (auto &d : fs::directory_iterator(dir))
+			std::cout << d.path().filename() << '\n';
 }
 
 int main(int argc, char* argv[])
@@ -73,6 +84,11 @@ int main(int argc, char* argv[])
 	// list
 	else if (std::string(argv[1]) == "-l")
 	{
+		if (argc > 3 
+			&& (std::string(argv[3]) == "-v"
+			|| std::string(argv[3]) == "--verbose"))
+			verbose = true;
+
 		if (argc < 3)
 			list_dir("");
 		else
@@ -118,7 +134,9 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 		// verbose
-		if (argc > 3 && std::string(argv[3]) == "-v")
+		if (argc > 3
+			&& (std::string(argv[3]) == "-v"
+			|| std::string(argv[3]) == "--verbose"))
 			verbose = true;
 
 		uint16_t magnitude = 0;
