@@ -6,7 +6,7 @@
 
 enum magnitude : uintmax_t
 {
-	byte = 1000,
+	byte = 1024,
 	kilobyte = byte * 1000,
 	megabyte = kilobyte * 1000,
 	gigabyte = megabyte * 1000,
