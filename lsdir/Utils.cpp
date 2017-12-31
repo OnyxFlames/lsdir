@@ -42,14 +42,14 @@ const std::vector<std::string> list_drives()
 	return drives;
 }
 
-const std::string to_shortsuffix(uintmax_t num)
+const std::string to_shortsuffix(uintmax_t num, unsigned short divisor)
 {
 	uint16_t magnitude = 0;
 	uintmax_t size = num;
 	uintmax_t counter = size;
 
 	//TODO: figure out if files are 1000's or 1024's
-	const unsigned short divisor = 1024;
+	//const unsigned short divisor = 1024;
 
 	if (size > divisor)
 	{
@@ -71,14 +71,14 @@ const std::string to_shortsuffix(uintmax_t num)
 	}
 }
 
-const std::string to_longsuffix(uintmax_t num)
+const std::string to_longsuffix(uintmax_t num, unsigned short divisor)
 {
 	uint16_t magnitude = 0;
 	uintmax_t size = num;
 	uintmax_t counter = size;
 
 	//TODO: figure out if files are 1000's or 1024's
-	const unsigned short divisor = 1024;
+	//const unsigned short divisor = 1024;
 
 	if (size > divisor)
 	{
@@ -100,14 +100,14 @@ const std::string to_longsuffix(uintmax_t num)
 		}
 }
 
-const double to_smallestmagnitude(uintmax_t num)
+const double to_smallestmagnitude(uintmax_t num, unsigned short divisor)
 {
 	uint16_t magnitude = 0;
-	double size = num;
-	uintmax_t counter = size;
+	double size = static_cast<double>(num);
+	uintmax_t counter = static_cast<uintmax_t>(size);
 
 	//TODO: figure out if files are 1000's or 1024's
-	const unsigned short divisor = 1024;
+	//const unsigned short divisor = 1024;
 
 	if (size > divisor)
 	{
