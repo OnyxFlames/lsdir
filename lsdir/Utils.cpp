@@ -4,11 +4,13 @@
 
 namespace fs = std::experimental::filesystem;
 
+#include <iostream>
+
 const std::vector<std::string> list_drives()
 {
 	std::vector<std::string> drives;
 	//Windows drives
-	for (char d = 'A'; d != 'Z'; d++)
+	for (char d = 'A'; d <= 'Z'; d++)
 	{
 		std::string str = "";
 		str = d;
@@ -19,21 +21,16 @@ const std::vector<std::string> list_drives()
 		}
 	}
 	// Linux drives
-	for (char d = 'a'; d != 'z'; d++)
+	for (char d = 'a'; d <= 'z'; d++)
 	{
-		std::string str = "sd";
+		std::string str = "/dev/sd";
 		str += d;
-		str += "1";
 		if (fs::exists(str))
 		{
 			drives.push_back(str);
 		}
-	}
-	for (char d = 'a'; d != 'z'; d++)
-	{
-		std::string str = "hd";
+		str = "/dev/hd";
 		str += d;
-		str += "1";
 		if (fs::exists(str))
 		{
 			drives.push_back(str);
