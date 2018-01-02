@@ -42,27 +42,6 @@ namespace fs = std::experimental::filesystem;
 bool show_hidden = false;
 bool verbose = false;
 
-void list_dir_r(const std::string dir, size_t depth = 0)
-{
-	for (auto& d : fs::directory_iterator(dir))
-	{
-		if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
-		{
-			std::cout << fg_brightblue << std::string(depth, '-') << reset;
-			if (depth > 0)
-				std::cout << fg_white << '|';
-			if (d.path().string()[0] == '.')
-				std::cout << fg_brightcyan << d.path().filename() << '\n';
-			else
-				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
-			if (fs::is_directory(dir))
-			{
-				list_dir_r(d.path().string(), depth + 1);
-			}
-		}
-	}
-}
-
 void list_dir(const std::string dir)
 {
 	if (verbose)
@@ -85,6 +64,39 @@ void list_dir(const std::string dir)
 				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
 			}
 		}
+}
+
+void list_dir_r(const std::string dir, size_t depth = 0)
+{
+	for (auto& d : fs::directory_iterator(dir))
+	{
+		if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
+		{
+			std::cout << fg_brightblue << std::string(depth, '-') << reset;
+			if (depth > 0)
+				std::cout << fg_white << '|';
+			if (d.path().string()[0] == '.')
+				std::cout << fg_brightcyan << d.path().filename() << '\n';
+			else
+				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
+			if (fs::is_directory(dir))
+			{
+				list_dir_r(d.path().string(), depth + 1);
+			}
+		}
+	}
+}
+
+void show_drive(const std::string drive)
+{
+	fs::space_info si;
+	si = fs::space(drive);
+	std::cout << "Drive '" << fs::path(drive) << "'\t\n"
+		<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << reset << "\n"
+		<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << reset << "\n"
+		<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << reset << "\n";
+	if (si.free != si.available)
+		std::cout << fg_red << "\tUnavailable:\t" << fg_brightred << (si.free - si.available) << " byte(s)\n";
 }
 
 int main(int argc, char* argv[])
@@ -128,11 +140,6 @@ int main(int argc, char* argv[])
 		{
 			list_dir(argv[1]);
 		}
-		else
-		{
-			std::cerr << "Invalid args!\n";
-			return 1;
-		}
 	}
 	// recursive list
 	else if (std::string(argv[1]) == "-r"
@@ -150,17 +157,9 @@ int main(int argc, char* argv[])
 	else if (std::string(argv[1]) == "-d"
 		|| std::string(argv[1]) == "--drive")
 	{
-		// todo: add util that converts to largest magnitude
 		if (argc > 2 && fs::exists(argv[2]))
 		{
-			fs::space_info si;
-			si = fs::space(argv[2]);
-			std::cout << "Drive '" << fs::path(argv[2]) << "'\t\n"
-				<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << reset << "\n"
-				<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << reset << "\n"
-				<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << reset << "\n";
-			if (si.free != si.available)
-				std::cout << fg_brightred << "\tUnavailable:\t" << (si.free - si.available) << "\n";
+			show_drive(argv[2]);
 		}
 		else
 		{
