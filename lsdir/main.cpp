@@ -6,7 +6,7 @@
 #define LSDIR_COLOR
 
 #ifdef LSDIR_COLOR
-	const char* reset = "\033[0m";
+	const char* fg_reset = "\033[0m";
 	const char* fg_red = "\033[31m";
 	const char* fg_green = "\033[32m";
 	const char* fg_yellow = "\033[33m";
@@ -21,7 +21,7 @@
 	const char* fg_brightmagenta = "\033[95m";
 	const char* fg_brightcyan = "\033[96m";
 #else
-	const char* reset = "";
+	const char* fg_reset = "";
 	const char* fg_red = "";
 	const char* fg_green = "";
 	const char* fg_yellow = "";
@@ -49,7 +49,7 @@ void list_dir(const std::string dir)
 		{
 			if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
 			{
-				std::cout << fg_brightcyan << d.path().filename() << reset << '\t';
+				std::cout << fg_brightcyan << d.path().filename() << fg_reset << '\t';
 				if (fs::is_directory(d))
 					std::cout << "/\n";
 				else
@@ -61,7 +61,7 @@ void list_dir(const std::string dir)
 		{
 			if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
 			{
-				std::cout << fg_brightcyan << d.path().filename() << reset << '\n';
+				std::cout << fg_brightcyan << d.path().filename() << fg_reset << '\n';
 			}
 		}
 }
@@ -72,7 +72,7 @@ void list_dir_r(const std::string dir, size_t depth = 0)
 	{
 		if (d.path().filename().string()[0] != '.' || show_hidden)	// hidden file
 		{
-			std::cout << fg_brightblue << std::string(depth, '-') << reset;
+			std::cout << fg_brightblue << std::string(depth, '-') << fg_reset;
 			if (depth > 0)
 				std::cout << fg_white << '|';
 			if (d.path().string()[0] == '.')
@@ -92,9 +92,9 @@ void show_drive(const std::string drive)
 	fs::space_info si;
 	si = fs::space(drive);
 	std::cout << "Drive '" << fs::path(drive) << "'\t\n"
-		<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << reset << "\n"
-		<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << reset << "\n"
-		<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << reset << "\n";
+		<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << fg_reset << "\n"
+		<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << fg_reset << "\n"
+		<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << fg_reset << "\n";
 	if (si.free != si.available)
 		std::cout << fg_red << "\tUnavailable:\t" << fg_brightred << (si.free - si.available) << " byte(s)\n";
 }
