@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "ArgumentHandler.hpp"
+
 enum magnitude : uintmax_t
 {
 	byte = 1024,
@@ -19,3 +21,8 @@ const std::string to_shortsuffix(uintmax_t num, unsigned short divisor = byte);
 const std::string to_longsuffix(uintmax_t num, unsigned short divisor = byte);
 
 const double to_smallestmagnitude(uintmax_t num, unsigned short divisor = byte);
+
+void list_dir(const std::string dir, FlagStruct& fs);
+void list_dir_r(const std::string dir, FlagStruct& fs, size_t depth = 0);
+void show_drive(const std::string drive, FlagStruct& fs);
+void show_size(const std::string file, FlagStruct& fs);
