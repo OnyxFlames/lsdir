@@ -4,6 +4,9 @@
 
 namespace fs = std::experimental::filesystem;
 
+#define DEBUG(x) std::printf("Debug: %s\n", x);
+
+#include <regex>
 #include <fstream>
 #include <iostream>
 
@@ -295,6 +298,49 @@ void search_dir(const std::string term, const std::string dir)
 			}
 		}
 		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << dir
+			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
+		for (const auto& ret : results)
+		{
+			std::cout << '\t' << fg_brightcyan << ret << "\n";
+		}
+		if (limit_reached)
+			std::cout << fg_green << "Result limit reached.\n" << fg_reset;
+	}
+}
+
+void regex_dir(const std::string pattern, const std::string dir)
+{
+	if (!fs::exists(dir) || !fs::is_directory(dir))
+	{
+		std::cerr << fg_red << "Error: " << fg_brightred << dir << " doesn't exist or is a file!\n";
+	}
+	else
+	{
+		
+		size_t found_count = 0;
+		bool limit_reached = false;
+		std::vector<std::string> results;
+		for (const auto& res : fs::recursive_directory_iterator(dir))
+		{
+			try
+			{
+				auto r_pattern = std::regex(pattern);
+				if (std::regex_search(res.path().filename().string().c_str(), r_pattern))
+				{
+					found_count++;
+					if (results.size() < 50)
+						results.push_back(res.path().filename().string());
+					else
+						limit_reached = true;
+				}
+			}
+			catch (std::regex_error e)
+			{
+				std::cerr << fg_red << "Error: " << fg_brightred << " Invalid regex pattern.\n" << fg_reset;
+				return;
+			}
+		}
+		std::cout << fg_green << "Using pattern: " << fg_brightgreen << "'" << pattern << "' in '" << dir
 			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
 		for (const auto& ret : results)
 		{

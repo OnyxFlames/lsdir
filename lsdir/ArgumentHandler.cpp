@@ -93,6 +93,24 @@ FlagStruct & ArgumentHandler::eval()
 					flags.paths[1] = arguments[++i];
 			}
 		}
+		if (c == "--regex")
+		{
+			if ((i + 1) >= arguments.size())
+			{
+				std::cerr << c << " expects a search pattern\n";
+			}
+			else
+			{
+				flags.regex_search = true;
+				flags.paths[0] = arguments[++i];
+				if ((i + 1) >= arguments.size())
+				{
+					flags.paths[1] = ".";
+				}
+				else
+					flags.paths[1] = arguments[++i];
+			}
+		}
 	}
 	return flags;
 }
@@ -112,7 +130,7 @@ void ArgumentHandler::exec()
 	if (flags.search)
 		search_dir(flags.paths[0], flags.paths[1]);
 	if (flags.regex_search)
-		std::cout << "--regex not currently supported.\n";
+		regex_dir(flags.paths[0], flags.paths[1]);
 }
 
 void ArgumentHandler::print_help()
