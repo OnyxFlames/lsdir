@@ -1,48 +1,18 @@
 #include "Utils.hpp"
 
+#include "ColorTable.hpp"
+
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
 
-#define DEBUG(x) std::printf("Debug: %s\n", x);
+#define DEBUG(x) do { std::printf(fg_brightyellow"Debug: %s\n", x); printf(fg_reset); } while(false);
 
 #include <regex>
 #include <fstream>
 #include <iostream>
 
-#define LSDIR_COLOR
 
-#ifdef LSDIR_COLOR
-const char* fg_reset = "\033[0m";
-const char* fg_red = "\033[31m";
-const char* fg_green = "\033[32m";
-const char* fg_yellow = "\033[33m";
-const char* fg_blue = "\033[34m";
-const char* fg_magenta = "\033[35m";
-const char* fg_cyan = "\033[36m";
-const char* fg_white = "\033[37m";
-const char* fg_brightred = "\033[91m";
-const char* fg_brightgreen = "\033[92m";
-const char* fg_brightyellow = "\033[93m";
-const char* fg_brightblue = "\033[94m";
-const char* fg_brightmagenta = "\033[95m";
-const char* fg_brightcyan = "\033[96m";
-#else
-const char* fg_reset = "";
-const char* fg_red = "";
-const char* fg_green = "";
-const char* fg_yellow = "";
-const char* fg_blue = "";
-const char* fg_magenta = "";
-const char* fg_cyan = "";
-const char* fg_white = "";
-const char* fg_brightred = "";
-const char* fg_brightgreen = "";
-const char* fg_brightyellow = "";
-const char* fg_brightblue = "";
-const char* fg_brightmagenta = "";
-const char* fg_brightcyan = "";
-#endif
 
 const std::vector<std::string> list_drives()
 {
@@ -297,7 +267,7 @@ void search_dir(const std::string term, const std::string dir)
 					limit_reached = true;
 			}
 		}
-		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << dir
+		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << fs::canonical(dir)
 			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
 		for (const auto& ret : results)
 		{
@@ -340,7 +310,7 @@ void regex_dir(const std::string pattern, const std::string dir)
 				return;
 			}
 		}
-		std::cout << fg_green << "Using pattern: " << fg_brightgreen << "'" << pattern << "' in '" << dir
+		std::cout << fg_green << "Using pattern: " << fg_brightgreen << "'" << pattern << "' in '/" << fs::canonical(dir).filename()
 			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
 		for (const auto& ret : results)
 		{
@@ -348,5 +318,35 @@ void regex_dir(const std::string pattern, const std::string dir)
 		}
 		if (limit_reached)
 			std::cout << fg_green << "Result limit reached.\n" << fg_reset;
+	}
+}
+
+void resize_file(const std::string file, uintmax_t size)
+{
+	if (!fs::exists(file) || fs::is_directory(file))
+	{
+		std::cerr << fg_red << "Error: " << fg_brightred << " file doesn't exist or is a directory.\n";
+		std::exit(1);
+	}
+	else
+	{
+		try
+		{
+			uintmax_t original = fs::file_size(file);
+			fs::resize_file(file, size);
+			std::cout << fg_cyan << "Resized '" << file << "' to " << fg_brightcyan << size << fg_cyan << " bytes.";
+			if (original > size)
+			{
+				std::cout << fg_brightred << " (-" << (original - size) << " bytes)" << fg_reset;
+			}
+			else if (original < size)
+			{
+				std::cout << fg_brightgreen << " (+" << (size - original) << " bytes)" << fg_reset;
+			}
+		}
+		catch(std::exception)
+		{
+			std::cerr << fg_red << "Error: " << fg_brightred << " invalid size for " << fg_cyan << "'" << file << "'\n";
+		}
 	}
 }

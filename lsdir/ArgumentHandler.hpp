@@ -14,8 +14,11 @@ struct FlagStruct
 	bool diff_file =	false;
 	bool search =		false;
 	bool regex_search = false;
+	bool resize_file =  false;
 
 	std::array<std::string, 2> paths;
+
+	uintmax_t size = 0;
 
 	bool verbose = false;
 };

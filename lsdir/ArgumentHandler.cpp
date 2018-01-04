@@ -1,5 +1,6 @@
 #include "ArgumentHandler.hpp"
 
+#include "ColorTable.hpp"
 #include "Utils.hpp"
 
 #include <iostream>
@@ -12,7 +13,7 @@ ArgumentHandler::ArgumentHandler(int _argc, char * _argv[])
 		arguments.push_back(_argv[i]);
 }
 
-FlagStruct & ArgumentHandler::eval()
+FlagStruct& ArgumentHandler::eval()
 {
 	for (size_t i = 0; i < arguments.size(); i++)
 	{
@@ -111,6 +112,19 @@ FlagStruct & ArgumentHandler::eval()
 					flags.paths[1] = arguments[++i];
 			}
 		}
+		if (c == "--resize")
+		{
+			if ((i + 2) >= arguments.size())
+			{
+				std::cerr << fg_red << "Error: " << fg_brightred << c << " expects <file>, then <value> in bytes.\n";
+			}
+			else
+			{
+				flags.resize_file = true;
+				flags.paths[0] = arguments[++i];
+				flags.size = std::stoll(arguments[++i]);
+			}
+		}
 	}
 	return flags;
 }
@@ -131,17 +145,23 @@ void ArgumentHandler::exec()
 		search_dir(flags.paths[0], flags.paths[1]);
 	if (flags.regex_search)
 		regex_dir(flags.paths[0], flags.paths[1]);
+	if (flags.resize_file)
+		resize_file(flags.paths[0], flags.size);
 }
 
 void ArgumentHandler::print_help()
 {
-	std::cout << "Usage: " << arguments[0] << " <directory> or\n\t" <<
+	std::cout << arguments[0] << " - Filesystem toolset" << "\nUsage: " << arguments[0] << " <directory> or\n\t" <<
 		arguments[0] << " <flag> <file/directory> [extra-flag]\n"
 		"Available flags: \n"
 		" -l/--list - lists files in directory\n"
 		" -r/--recursive - lists files in directory as well as their children directories\n"
 		" -d/--drive - lists drive info\n"
-		" -s/--sizeof - returns size of given file";
+		" -s/--sizeof - returns size of given file\n"
+		" --diff - compares two files\n"
+		" --search - uses <term> to search in <dir>\n"
+		" --regex - uses <pattern> to search in <dir\n"
+		" --resize - resizes <file to size in <bytes>";
 	std::exit(1);
 }
 

@@ -29,3 +29,4 @@ void show_size(const std::string file, FlagStruct& fs);
 void diff_files(const std::string first, const std::string second);
 void search_dir(const std::string term, const std::string dir);
 void regex_dir(const std::string pattern, const std::string dir);
+void resize_file(const std::string file, uintmax_t size);
