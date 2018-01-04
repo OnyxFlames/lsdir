@@ -24,12 +24,18 @@ FlagStruct & ArgumentHandler::eval()
 		if (c == "-l" || c == "--list")
 		{
 			flags.list_dir = true;
-			flags.paths[0] = arguments[i + 1];
+			if ((i + 1) >= arguments.size())
+				flags.paths[0] = ".";
+			else
+				flags.paths[0] = arguments[++i];
 		}
 		if (c == "-r" || c == "--recursive")
 		{
 			flags.list_dir_r = true;
-			flags.paths[0] = arguments[i + 1];
+			if ((i + 1) >= arguments.size())
+				flags.paths[0] = ".";
+			else
+				flags.paths[0] = arguments[++i];
 		}
 		if (c == "-d" || c == "--drive")
 		{
@@ -37,7 +43,7 @@ FlagStruct & ArgumentHandler::eval()
 			if ((i + 1) >= arguments.size())
 				flags.paths[0] = list_drives()[0];
 			else
-				flags.paths[0] = arguments[i + 1];
+				flags.paths[0] = arguments[++i];
 				
 		}
 		if (c == "-v" || c == "--verbose")
@@ -48,12 +54,43 @@ FlagStruct & ArgumentHandler::eval()
 		{
 			if ((i + 1) >= arguments.size())
 			{
-				std::cerr << c << " required a valid file\n";
+				std::cerr << c << " expects file\n";
 			}
 			else
 			{
 				flags.show_size = true;
-				flags.paths[0] = arguments[i + 1];
+				flags.paths[0] = arguments[++i];
+			}
+		}
+		if (c == "--diff")
+		{
+			if ((i + 2) >= arguments.size())
+			{
+				std::cerr << c << " expects 2 files\n";
+			}
+			else
+			{
+				flags.diff_file = true;
+				flags.paths[0] = arguments[++i];
+				flags.paths[1] = arguments[++i];
+			}
+		}
+		if (c == "--search")
+		{
+			if ((i + 1) >= arguments.size())
+			{
+				std::cerr << c << " expects a search term\n";
+			}
+			else
+			{
+				flags.search = true;
+				flags.paths[0] = arguments[++i];
+				if ((i + 1) >= arguments.size())
+				{
+					flags.paths[1] = ".";
+				}
+				else
+					flags.paths[1] = arguments[++i];
 			}
 		}
 	}
@@ -71,9 +108,9 @@ void ArgumentHandler::exec()
 	if (flags.show_size)
 		show_size(flags.paths[0], flags);
 	if (flags.diff_file)
-		std::cout << "--diff not currently supported.\n";
+		diff_files(flags.paths[0], flags.paths[1]);
 	if (flags.search)
-		std::cout << "--search not currently supported.\n";
+		search_dir(flags.paths[0], flags.paths[1]);
 	if (flags.regex_search)
 		std::cout << "--regex not currently supported.\n";
 }

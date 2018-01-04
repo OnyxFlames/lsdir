@@ -4,6 +4,7 @@
 
 namespace fs = std::experimental::filesystem;
 
+#include <fstream>
 #include <iostream>
 
 #define LSDIR_COLOR
@@ -213,10 +214,93 @@ void show_size(const std::string file, FlagStruct& fs)
 	if (!fs::exists(file)
 		|| fs::is_directory(file))
 	{
-		std::cerr << "Not a file.\n";
+		std::cerr << fg_red << "Error: " << fg_brightred << "Not a file.\n";
 		std::exit(1);
 	}
 	std::cout << fg_brightcyan << to_smallestmagnitude(fs::file_size(file)) << ' ' << to_longsuffix(fs::file_size(file)) << '\n';
 	if (fs.verbose)
 		std::cout << "(" << fs::file_size(file) << " bytes)\n";
+}
+
+void diff_files(const std::string first, const std::string second)
+{
+	if (!fs::exists(first))
+	{
+		std::cerr << fg_red << "Error: " << fg_brightred << first << " doesn't exist or is a directory.\n" << fg_reset;
+		return;
+	}
+	if (!fs::exists(second))
+	{
+		std::cerr << fg_red << "Error: " << fg_brightred << second << " doesn't exist or is a directory.\n" << fg_reset;
+		return;
+	}
+
+	std::ifstream first_file(first), second_file(second);
+	if (!first_file.is_open() || !second_file.is_open())
+	{
+		std::cerr << fg_red << "Error: " << fg_brightred << second << "" << fg_reset;
+	}
+	int f, s;
+	size_t addr = 0;
+	size_t max_diff = 100;
+	std::string diff = "";
+	std::vector<size_t> diff_addr;
+	std::vector<std::string> diffs;
+	while (max_diff > 0)
+	{
+		f = first_file.get();
+		s = second_file.get();
+		if (f != s)
+		{
+			if(isalnum(s))
+				diff += s;
+		}
+		else if (diff != "")
+		{
+			diffs.push_back(diff);
+			diff_addr.push_back(addr);
+			diff = "";
+			max_diff--;
+		}
+		addr++;
+		if (first_file.eof() && second_file.eof())
+			break;
+	}
+	for (size_t d = 0; d < diffs.size(); d++)
+	{
+		std::cout << fg_green << "0x" << std::hex << diff_addr[d] << std::dec << fg_brightgreen << " '" << diffs[d] << "'\n";
+	}
+}
+
+void search_dir(const std::string term, const std::string dir)
+{
+	if (!fs::exists(dir) || !fs::is_directory(dir))
+	{
+		std::cerr << fg_red << "Error: " << fg_brightred << dir << " doesn't exist or is a file!\n";
+	}
+	else
+	{
+		size_t found_count = 0;
+		bool limit_reached = false;
+		std::vector<std::string> results;
+		for (const auto& res : fs::recursive_directory_iterator(dir))
+		{
+			if (res.path().filename().string().find(term) != std::string::npos)
+			{
+				found_count++;
+				if (results.size() < 50)
+					results.push_back(res.path().filename().string());
+				else
+					limit_reached = true;
+			}
+		}
+		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << dir
+			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
+		for (const auto& ret : results)
+		{
+			std::cout << '\t' << fg_brightcyan << ret << "\n";
+		}
+		if (limit_reached)
+			std::cout << fg_green << "Result limit reached.\n" << fg_reset;
+	}
 }
