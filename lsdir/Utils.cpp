@@ -11,7 +11,7 @@ namespace fs = std::experimental::filesystem;
 #include <regex>
 #include <fstream>
 #include <iostream>
-
+#include <cctype>
 
 
 const std::vector<std::string> list_drives()
@@ -123,6 +123,47 @@ const double to_smallestmagnitude(uintmax_t num, unsigned short divisor)
 		}
 	}
 	return size;
+}
+
+uintmax_t to_byte_value(const std::string magnitude_string)
+{
+	char mag_char = magnitude_string.at(magnitude_string.size() - 1);
+	// If the last character is a digit then the magnitude is represented as a value in bytes,
+	// so we don't need to do anything to it.
+	if (!std::isalpha(mag_char))
+	{
+		return std::stoll(magnitude_string);
+	}
+	else if (std::isalpha(mag_char))
+	{
+		switch (std::toupper(mag_char))
+		{
+		case 'B':
+			return std::stoll(magnitude_string);
+			break;
+		case 'K':
+			return std::stoll(magnitude_string) * kilobyte;
+			break;
+		case 'M':
+			return std::stoll(magnitude_string) * megabyte;
+			break;
+		case 'G':
+			return std::stoll(magnitude_string) * gigabyte;
+			break;
+		case 'T':
+			return std::stoll(magnitude_string) * terabyte;
+			break;
+		default:
+			std::cerr << fg_red << "Error: " << fg_brightred << " the suffix of byte value isn't recognized.\n";
+			std::exit(1);
+			return 0;
+			break;
+		}
+	}
+	else
+	{
+
+	}
 }
 
 void list_dir(const std::string dir, FlagStruct& fs)
@@ -337,11 +378,13 @@ void resize_file(const std::string file, uintmax_t size)
 			std::cout << fg_cyan << "Resized '" << file << "' to " << fg_brightcyan << size << fg_cyan << " bytes.";
 			if (original > size)
 			{
-				std::cout << fg_brightred << " (-" << (original - size) << " bytes)" << fg_reset;
+				//std::cout << fg_brightred << " (-" << (original - size) << " bytes)" << fg_reset;
+				std::cout << fg_brightred << " (-" << to_smallestmagnitude(original - size) << " " << to_longsuffix(original - size) << ")" << fg_reset;
 			}
 			else if (original < size)
 			{
-				std::cout << fg_brightgreen << " (+" << (size - original) << " bytes)" << fg_reset;
+				//std::cout << fg_brightgreen << " (+" << (size - original) << " bytes)" << fg_reset;
+				std::cout << fg_brightgreen << " (+" << to_smallestmagnitude(size - original) << " " << to_longsuffix(size - original) << ")" << fg_reset;
 			}
 		}
 		catch(std::exception)

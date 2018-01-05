@@ -122,7 +122,7 @@ FlagStruct& ArgumentHandler::eval()
 			{
 				flags.resize_file = true;
 				flags.paths[0] = arguments[++i];
-				flags.size = std::stoll(arguments[++i]);
+				flags.size = to_byte_value(arguments[++i]);
 			}
 		}
 	}

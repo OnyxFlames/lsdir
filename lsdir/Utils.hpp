@@ -8,7 +8,7 @@
 
 enum magnitude : uintmax_t
 {
-	byte = 1024,
+	byte = 1,
 	kilobyte = byte * 1000,
 	megabyte = kilobyte * 1000,
 	gigabyte = megabyte * 1000,
@@ -17,10 +17,12 @@ enum magnitude : uintmax_t
 
 const std::vector<std::string> list_drives();
 
-const std::string to_shortsuffix(uintmax_t num, unsigned short divisor = byte);
-const std::string to_longsuffix(uintmax_t num, unsigned short divisor = byte);
+const std::string to_shortsuffix(uintmax_t num, unsigned short divisor = kilobyte);
+const std::string to_longsuffix(uintmax_t num, unsigned short divisor = kilobyte);
 
-const double to_smallestmagnitude(uintmax_t num, unsigned short divisor = byte);
+const double to_smallestmagnitude(uintmax_t num, unsigned short divisor = kilobyte);
+
+uintmax_t to_byte_value(const std::string magnitude_string);
 
 void list_dir(const std::string dir, FlagStruct& fs);
 void list_dir_r(const std::string dir, FlagStruct& fs, size_t depth = 0);
