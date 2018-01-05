@@ -20,7 +20,7 @@ struct FlagStruct
 	std::array<std::string, 2> paths;
 
 	uintmax_t size = 0;
-	int64_t res_limit = 50;
+	uintmax_t res_limit = 50;
 
 	bool verbose = false;
 };

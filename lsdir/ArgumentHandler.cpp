@@ -134,7 +134,7 @@ FlagStruct& ArgumentHandler::eval()
 			else
 			{
 				//flags.newresult_limit = true;
-				flags.res_limit = std::stol(arguments[++i]);
+				flags.res_limit = std::stoll(arguments[++i]);
 			}
 		}
 	}

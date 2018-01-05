@@ -12,7 +12,7 @@ namespace fs = std::experimental::filesystem;
 #include <fstream>
 #include <iostream>
 #include <cctype>
-
+#include <iomanip>
 
 const std::vector<std::string> list_drives()
 {
@@ -160,10 +160,7 @@ uintmax_t to_byte_value(const std::string magnitude_string)
 			break;
 		}
 	}
-	else
-	{
-
-	}
+	return -1;
 }
 
 void list_dir(const std::string dir, FlagStruct& fs)
@@ -257,32 +254,30 @@ void diff_files(const std::string first, const std::string second)
 	int f, s;
 	size_t addr = 0;
 	size_t max_diff = 100;
-	std::string diff = "";
-	std::vector<size_t> diff_addr;
-	std::vector<std::string> diffs;
-	while (max_diff > 0)
+	std::cout << fg_cyan << "Address | " << fs::path(first).filename() << " | " << fs::path(second).filename() << fg_reset << "\n";
+	while (max_diff > 0 && (!first_file.eof()) && (!second_file.eof()))
 	{
+		addr++;
 		f = first_file.get();
 		s = second_file.get();
 		if (f != s)
 		{
-			if(isalnum(s))
-				diff += s;
-		}
-		else if (diff != "")
-		{
-			diffs.push_back(diff);
-			diff_addr.push_back(addr);
-			diff = "";
+			std::cout << std::setw(8) << std::hex << fg_cyan << addr << ":\t";
+			std::cout << fg_brightcyan << "0x"<< (int)f << " | " << "0x" << (int)s;
+
+			if ((std::isprint(f) || std::isprint(s)) && (!isspace(f) && !isspace(s)))
+			{
+				std::cout << " | " << fg_brightcyan << "'" << (char)f << "' | '" << (char)s << "'\n";
+			}
+			else
+				std::cout << "\n";
 			max_diff--;
 		}
-		addr++;
-		if (first_file.eof() && second_file.eof())
-			break;
-	}
-	for (size_t d = 0; d < diffs.size(); d++)
-	{
-		std::cout << fg_green << "0x" << std::hex << diff_addr[d] << std::dec << fg_brightgreen << " '" << diffs[d] << "'\n";
+
+		if (f == std::numeric_limits<int>::lowest() || s == std::numeric_limits<int>::lowest())
+		{
+			DEBUG("At the end bish") break;
+		}
 	}
 }
 
@@ -302,14 +297,14 @@ void search_dir(const std::string term, const std::string dir, FlagStruct& fs)
 			if (res.path().filename().string().find(term) != std::string::npos)
 			{
 				found_count++;
-				if (results.size() < fs.res_limit || fs.res_limit == -1)
+				if (results.size() < fs.res_limit || fs.res_limit == 0)
 					results.push_back(res.path().filename().string());
 				else
 					limit_reached = true;
 			}
 		}
 		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << fs::canonical(dir);
-		if(fs.res_limit == -1)
+		if(fs.res_limit == 0)
 			std::cout << "'\n" << fg_green << "Found (" << found_count << ") | Showing All\n";
 		else
 			std::cout << "'\n" << fg_green << "Found (" << found_count << ") | Showing (" << fs.res_limit << ")\n";
@@ -342,7 +337,7 @@ void regex_dir(const std::string pattern, const std::string dir, FlagStruct& fs)
 				if (std::regex_search(res.path().filename().string().c_str(), r_pattern))
 				{
 					found_count++;
-					if (results.size() < fs.res_limit)
+					if (results.size() < fs.res_limit || fs.res_limit == 0)
 						results.push_back(res.path().filename().string());
 					else
 						limit_reached = true;
@@ -354,8 +349,11 @@ void regex_dir(const std::string pattern, const std::string dir, FlagStruct& fs)
 				return;
 			}
 		}
-		std::cout << fg_green << "Using pattern: " << fg_brightgreen << "'" << pattern << "' in '/" << fs::canonical(dir).filename()
-			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
+		std::cout << fg_green << "Using pattern: " << fg_brightgreen << "'" << pattern << "' in '/" << fs::canonical(dir).filename();
+		if (fs.res_limit == 0)
+			std::cout << "'\n" << fg_green << "Found (" << found_count << ") | Showing All\n";
+		else
+			std::cout << "'\n" << fg_green << "Found (" << found_count << ") | Showing (" << fs.res_limit << ")\n";
 		for (const auto& ret : results)
 		{
 			std::cout << '\t' << fg_brightcyan << ret << "\n";
