@@ -233,7 +233,7 @@ void show_size(const std::string file, FlagStruct& fs)
 		std::cout << "(" << fs::file_size(file) << " bytes)\n";
 }
 
-void diff_files(const std::string first, const std::string second)
+void diff_files(const std::string first, const std::string second, FlagStruct& fs)
 {
 	if (!fs::exists(first))
 	{
@@ -253,7 +253,7 @@ void diff_files(const std::string first, const std::string second)
 	}
 	int f, s;
 	size_t addr = 0;
-	size_t max_diff = 100;
+	uintmax_t max_diff = fs.res_limit;
 	std::cout << fg_cyan << "Address | " << fs::path(first).filename() << " | " << fs::path(second).filename() << fg_reset << "\n";
 	while (max_diff > 0 && (!first_file.eof()) && (!second_file.eof()))
 	{
@@ -263,20 +263,16 @@ void diff_files(const std::string first, const std::string second)
 		if (f != s)
 		{
 			std::cout << std::setw(8) << std::hex << fg_cyan << addr << ":\t";
-			std::cout << fg_brightcyan << "0x"<< (int)f << " | " << "0x" << (int)s;
+			//std::cout << fg_brightcyan << "0x"<< (int)f << " | " << "0x" << (int)s;
 
 			if ((std::isprint(f) || std::isprint(s)) && (!isspace(f) && !isspace(s)))
 			{
-				std::cout << " | " << fg_brightcyan << "'" << (char)f << "' | '" << (char)s << "'\n";
+				//std::cout << " | " << fg_brightcyan << "'" << (char)f << "' | '" << (char)s << "'\n";
+				std::cout << fg_brightcyan << "0x" << (int)f << " ('" << char(f) << "') | " << "0x" << (int)s << " ('" << char(s) << "')\n";
 			}
 			else
-				std::cout << "\n";
+				std::cout << fg_brightcyan << "0x" << (int)f << " | " << "0x" << (int)s << "\n";
 			max_diff--;
-		}
-
-		if (f == std::numeric_limits<int>::lowest() || s == std::numeric_limits<int>::lowest())
-		{
-			DEBUG("At the end bish") break;
 		}
 	}
 }

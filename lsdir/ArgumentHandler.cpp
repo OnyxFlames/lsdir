@@ -152,7 +152,7 @@ void ArgumentHandler::exec()
 	if (flags.show_size)
 		show_size(flags.paths[0], flags);
 	if (flags.diff_file)
-		diff_files(flags.paths[0], flags.paths[1]);
+		diff_files(flags.paths[0], flags.paths[1], flags);
 	if (flags.search)
 		search_dir(flags.paths[0], flags.paths[1], flags);
 	if (flags.regex_search)
@@ -173,7 +173,8 @@ void ArgumentHandler::print_help()
 		" --diff - compares two files\n"
 		" --search - uses <term> to search in <dir>\n"
 		" --regex - uses <pattern> to search in <dir\n"
-		" --resize - resizes <file> to size in <bytes>";
+		" --resize - resizes <file> to size in <bytes>\n"
+		" --resultlimit - limits results to <value> when applicable\n";
 	std::exit(1);
 }
 
