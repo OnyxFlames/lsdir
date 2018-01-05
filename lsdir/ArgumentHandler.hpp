@@ -15,10 +15,12 @@ struct FlagStruct
 	bool search =		false;
 	bool regex_search = false;
 	bool resize_file =  false;
+	//bool newresult_limit = false;
 
 	std::array<std::string, 2> paths;
 
 	uintmax_t size = 0;
+	int64_t res_limit = 50;
 
 	bool verbose = false;
 };

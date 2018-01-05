@@ -29,6 +29,6 @@ void list_dir_r(const std::string dir, FlagStruct& fs, size_t depth = 0);
 void show_drive(const std::string drive, FlagStruct& fs);
 void show_size(const std::string file, FlagStruct& fs);
 void diff_files(const std::string first, const std::string second);
-void search_dir(const std::string term, const std::string dir);
-void regex_dir(const std::string pattern, const std::string dir);
+void search_dir(const std::string term, const std::string dir, FlagStruct& fs);
+void regex_dir(const std::string pattern, const std::string dir, FlagStruct& fs);
 void resize_file(const std::string file, uintmax_t size);

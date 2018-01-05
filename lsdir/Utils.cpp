@@ -286,7 +286,7 @@ void diff_files(const std::string first, const std::string second)
 	}
 }
 
-void search_dir(const std::string term, const std::string dir)
+void search_dir(const std::string term, const std::string dir, FlagStruct& fs)
 {
 	if (!fs::exists(dir) || !fs::is_directory(dir))
 	{
@@ -302,14 +302,17 @@ void search_dir(const std::string term, const std::string dir)
 			if (res.path().filename().string().find(term) != std::string::npos)
 			{
 				found_count++;
-				if (results.size() < 50)
+				if (results.size() < fs.res_limit || fs.res_limit == -1)
 					results.push_back(res.path().filename().string());
 				else
 					limit_reached = true;
 			}
 		}
-		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << fs::canonical(dir)
-			<< "'\n" << fg_green << "Found " << "(" << found_count << "):\n";
+		std::cout << fg_green << "Searching for: " << fg_brightgreen << "'" << term << "' in '" << fs::canonical(dir);
+		if(fs.res_limit == -1)
+			std::cout << "'\n" << fg_green << "Found (" << found_count << ") | Showing All\n";
+		else
+			std::cout << "'\n" << fg_green << "Found (" << found_count << ") | Showing (" << fs.res_limit << ")\n";
 		for (const auto& ret : results)
 		{
 			std::cout << '\t' << fg_brightcyan << ret << "\n";
@@ -319,7 +322,7 @@ void search_dir(const std::string term, const std::string dir)
 	}
 }
 
-void regex_dir(const std::string pattern, const std::string dir)
+void regex_dir(const std::string pattern, const std::string dir, FlagStruct& fs)
 {
 	if (!fs::exists(dir) || !fs::is_directory(dir))
 	{
@@ -339,7 +342,7 @@ void regex_dir(const std::string pattern, const std::string dir)
 				if (std::regex_search(res.path().filename().string().c_str(), r_pattern))
 				{
 					found_count++;
-					if (results.size() < 50)
+					if (results.size() < fs.res_limit)
 						results.push_back(res.path().filename().string());
 					else
 						limit_reached = true;

@@ -125,6 +125,18 @@ FlagStruct& ArgumentHandler::eval()
 				flags.size = to_byte_value(arguments[++i]);
 			}
 		}
+		if (c == "--resultlimit")
+		{
+			if ((i + 1) >= arguments.size())
+			{
+				std::cerr << fg_red << "Error: " << fg_brightred << c << " expected integer for result limit.\n";
+			}
+			else
+			{
+				//flags.newresult_limit = true;
+				flags.res_limit = std::stol(arguments[++i]);
+			}
+		}
 	}
 	return flags;
 }
@@ -142,9 +154,9 @@ void ArgumentHandler::exec()
 	if (flags.diff_file)
 		diff_files(flags.paths[0], flags.paths[1]);
 	if (flags.search)
-		search_dir(flags.paths[0], flags.paths[1]);
+		search_dir(flags.paths[0], flags.paths[1], flags);
 	if (flags.regex_search)
-		regex_dir(flags.paths[0], flags.paths[1]);
+		regex_dir(flags.paths[0], flags.paths[1], flags);
 	if (flags.resize_file)
 		resize_file(flags.paths[0], flags.size);
 }
@@ -161,7 +173,7 @@ void ArgumentHandler::print_help()
 		" --diff - compares two files\n"
 		" --search - uses <term> to search in <dir>\n"
 		" --regex - uses <pattern> to search in <dir\n"
-		" --resize - resizes <file to size in <bytes>";
+		" --resize - resizes <file> to size in <bytes>";
 	std::exit(1);
 }
 
