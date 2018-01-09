@@ -24,7 +24,8 @@ const double to_smallestmagnitude(uintmax_t num, unsigned short divisor = kiloby
 
 uintmax_t to_byte_value(const std::string magnitude_string);
 
-const std::string get_drive_status_color(long double _val);
+const std::string get_drive_avail_color(float _val);
+const std::string get_drive_used_color(float _val);
 
 void list_dir(const std::string dir, FlagStruct& fs);
 void list_dir_r(const std::string dir, FlagStruct& fs, size_t depth = 0);

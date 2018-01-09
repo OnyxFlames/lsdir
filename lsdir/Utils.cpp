@@ -7,6 +7,8 @@
 namespace fs = std::experimental::filesystem;
 
 #define DEBUG(x) do { std::printf(fg_brightyellow"Debug: %s\n", x); printf(fg_reset); } while(false);
+#define DEBUGN(x) do { std::printf(fg_brightyellow"Debug: %20jd\n", x); printf(fg_reset); } while(false);
+#define DEBUGF(x) do { std::printf(fg_brightyellow"Debug: %f\n", x); printf(fg_reset); } while(false);
 
 #include <regex>
 #include <fstream>
@@ -163,16 +165,28 @@ uintmax_t to_byte_value(const std::string magnitude_string)
 	return -1;
 }
 
-const std::string get_drive_status_color(long double _val)
+const std::string get_drive_avail_color(float _val)
 {
 	if (_val > 100 || _val < 0)
 		return "INVALID DRIVE STATUS";
 	else if (_val > 25)
 		return fg_brightgreen;
 	else if (_val > 10)
-		return fg_brightyellow;
+		return fg_yellow;
 	else
 		return fg_brightred;
+}
+
+const std::string get_drive_used_color(float _val)
+{
+	if (_val > 100 || _val < 0)
+		return "INVALID DRIVE STATUS";
+	else if (_val > 90)
+		return fg_brightred;
+	else if (_val > 75)
+		return fg_yellow;
+	else
+		return fg_brightgreen;
 }
 
 void list_dir(const std::string dir, FlagStruct& fs)
@@ -213,12 +227,18 @@ void show_drive(const std::string drive, FlagStruct& fs)
 	{
 		fs::space_info si;
 		si = fs::space(drive);
-		std::cout << "Drive '" << fs::path(drive) << "' ""\t\n"
+		float percent_avail = static_cast<float>((float)si.available / (float)si.capacity) * 100;
+		float percent_used = 100 - percent_avail;
+		std::cout << "Drive '" << fs::path(drive) << "'\n"
 			<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << fg_reset << "\n"
-			<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << fg_reset << "\n"
-			<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << fg_reset << "\n";
+			<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << fg_reset << "\n";
+
+		std::cout << std::setprecision(4) << fg_cyan << "\tAvailable:\t" << get_drive_avail_color(percent_avail) << percent_avail << "%" << fg_cyan
+			<< fg_cyan << "\n\tUsed:\t\t" << get_drive_used_color(percent_used) << percent_used << "%\n" << fg_reset << std::setprecision(6);
+
 		if (si.free != si.available)
-			std::cout << fg_red << "\tUnavailable:\t" << fg_brightred << (si.free - si.available) << " byte(s)\n";
+			std::cout << fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << fg_reset << "\n"
+			<< fg_red << "\tUnavailable:\t" << fg_brightred << (si.free - si.available) << " byte(s)\n";
 	}
 	else
 	{
