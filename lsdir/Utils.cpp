@@ -163,6 +163,18 @@ uintmax_t to_byte_value(const std::string magnitude_string)
 	return -1;
 }
 
+const std::string get_drive_status_color(long double _val)
+{
+	if (_val > 100 || _val < 0)
+		return "INVALID DRIVE STATUS";
+	else if (_val > 25)
+		return fg_brightgreen;
+	else if (_val > 10)
+		return fg_brightyellow;
+	else
+		return fg_brightred;
+}
+
 void list_dir(const std::string dir, FlagStruct& fs)
 {
 	for (auto &d : fs::directory_iterator(dir))
@@ -222,15 +234,27 @@ void show_drive(const std::string drive, FlagStruct& fs)
 
 void show_size(const std::string file, FlagStruct& fs)
 {
-	if (!fs::exists(file)
-		|| fs::is_directory(file))
+	if (!fs::exists(file))
 	{
 		std::cerr << fg_red << "Error: " << fg_brightred << "Not a file.\n";
 		std::exit(1);
 	}
-	std::cout << fg_brightcyan << to_smallestmagnitude(fs::file_size(file)) << ' ' << to_longsuffix(fs::file_size(file)) << '\n';
-	if (fs.verbose)
-		std::cout << "(" << fs::file_size(file) << " bytes)\n";
+	else if (fs::is_directory(file))
+	{
+		uintmax_t dir_size = 0;
+		for (const auto& entry : fs::recursive_directory_iterator(file))
+			if (!fs::is_directory(entry.path()))
+				dir_size += fs::file_size(entry.path());
+		std::cout << fg_cyan << "Directory: " << fg_brightcyan << to_smallestmagnitude(dir_size) << ' ' << to_longsuffix(dir_size) << '\n';
+		if (fs.verbose)
+			std::cout << "(" << dir_size << " bytes)\n";
+	}
+	else
+	{
+		std::cout << fg_cyan << "File: " << fg_brightcyan << to_smallestmagnitude(fs::file_size(file)) << ' ' << to_longsuffix(fs::file_size(file)) << '\n';
+		if (fs.verbose)
+			std::cout << "(" << fs::file_size(file) << " bytes)\n";
+	}
 }
 
 void diff_files(const std::string first, const std::string second, FlagStruct& fs)

@@ -3,7 +3,7 @@
 
 #include "Utils.hpp"
 #include "ArgumentHandler.hpp"
-
+#include "ColorTable.hpp"
 
 namespace fs = std::experimental::filesystem;
 
