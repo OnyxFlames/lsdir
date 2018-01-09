@@ -201,7 +201,7 @@ void show_drive(const std::string drive, FlagStruct& fs)
 	{
 		fs::space_info si;
 		si = fs::space(drive);
-		std::cout << "Drive '" << fs::path(drive) << "'\t\n"
+		std::cout << "Drive '" << fs::path(drive) << "' ""\t\n"
 			<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << fg_reset << "\n"
 			<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << fg_reset << "\n"
 			<< fg_cyan << "\tFree:\t\t" << fg_brightcyan << to_smallestmagnitude(si.free) << ' ' << to_longsuffix(si.free) << fg_reset << "\n";

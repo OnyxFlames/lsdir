@@ -19,6 +19,8 @@ FlagStruct& ArgumentHandler::eval()
 	{
 		std::string c = arguments[i];
 
+		if (arguments.size() == 1)
+			std::cout << "Use -h or --help for usage.\n";
 		if (c == "-h" || c == "--help")
 			print_help();
 
