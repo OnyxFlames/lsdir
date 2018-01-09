@@ -228,7 +228,7 @@ void show_drive(const std::string drive, FlagStruct& fs)
 		fs::space_info si;
 		si = fs::space(drive);
 		float percent_avail = static_cast<float>((float)si.available / (float)si.capacity) * 100;
-		float percent_used = 100 - percent_avail;
+		float percent_used = (100 - percent_avail);
 		std::cout << "Drive '" << fs::path(drive) << "'\n"
 			<< fg_cyan << "\tAvailable:\t" << fg_brightcyan << to_smallestmagnitude(si.available) << ' ' << to_longsuffix(si.available) << fg_reset << "\n"
 			<< fg_cyan << "\tCapacity:\t" << fg_brightcyan << to_smallestmagnitude(si.capacity) << ' ' << to_longsuffix(si.capacity) << fg_reset << "\n";
